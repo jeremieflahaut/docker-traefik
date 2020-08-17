@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: traefik:v2.2
+    container_name: proxy-reverse
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    networks:
+      - antibes
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .docker/acme.json:/acme.json
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=email@example.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/acme.json"
+    
+networks:
+  antibes:
+    name: antibes
